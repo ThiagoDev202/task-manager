@@ -8,7 +8,7 @@ export const useTaskManager = () => {
   const [modalData, setModalData] = useState('');
   const [open, setOpen] = useState(false);
 
-  const [columnsArr, setColumnsArr] = useState([
+  const [columnsArr] = useState([
     { id: 1, title: ToDo },
     { id: 2, title: InProgress },
     { id: 3, title: Review },
