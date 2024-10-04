@@ -1,84 +1,74 @@
-import React, { useEffect, useState } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { TouchBackend } from 'react-dnd-touch-backend';
+import React, { useState } from 'react';
 import Column from '@/components/Column/Column';
-import SingleCard from '@/components/SingleCard/SingleCard';
-import { useTaskManager } from '../hooks/useTaskManager';
+import Modal from '@/components/modals/Modal';
+import useModal from '@/components/Column/useModal';
 
-const Home = () => {
-    const {
-        columnsArr,
-        progress,
-        items,
-        moveCardHandler,
-        setItems, // Obtendo setItems do hook
-    } = useTaskManager();
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+}
 
-    const [isMobile, setIsMobile] = useState(false);
+const Home: React.FC = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const { open, handleOpen, handleClose, handleSave } = useModal();
 
-    // Verifica se é um dispositivo móvel após o componente ser montado
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768); // Altere a largura conforme necessário
-        };
-
-        // Chama a função uma vez na montagem do componente
-        handleResize();
-
-        // Adiciona um listener de resize
-        window.addEventListener('resize', handleResize);
-
-        // Limpa o listener na desmontagem
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    // Funções e estados necessários para o modal
-    const handleModalSave = () => { /* lógica de salvar */ };
-    const handleModalDataChange = (data: any) => { /* lógica de alteração */ };
-    const handleOpen = () => { /* lógica para abrir */ };
-    const handleClose = () => { /* lógica para fechar */ };
-    const modalData = {}; // Dados do modal
-    const open = false; // Estado do modal
-  
-    const returnItemsForColumn = (columnTitle: string) => {
-        return items
-          .filter(item => item.column === columnTitle)
-          .map((item, index) => (
-              <SingleCard
-                  key={item.id}
-                  name={item.name}
-                  setItems={setItems} // Passando setItems corretamente
-                  index={index}
-                  moveCardHandler={moveCardHandler}
-                  columnsArr={columnsArr}
-              />
-          ));
-    };
-
-    return (
-      <div className="container mx-auto p-4">
-        <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
-          <div className="flex flex-wrap justify-center gap-4">
-            {columnsArr.map((e) => (
-              <Column
-                key={e.id}
-                title={e.title}
-                progress={Number(progress)} // Convertendo progress para número
-                handleModalSave={handleModalSave}
-                handleModalDataChange={handleModalDataChange}
-                handleOpen={handleOpen}
-                handleClose={handleClose}
-                modalData={modalData}
-                open={open}
-              >
-                {returnItemsForColumn(e.title)}
-              </Column>
-            ))}
-          </div>
-        </DndProvider>
-      </div>
+  const handleDrop = (e: React.DragEvent, status: string) => {
+    const id = parseInt(e.dataTransfer.getData('text/plain'));
+    const updatedTasks = tasks.map((task) =>
+      task.id === id ? { ...task, status } : task
     );
+    setTasks(updatedTasks);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const addTask = (title: string, description: string) => {
+    const newTask: Task = {
+      id: Date.now(),
+      title,
+      description,
+      status: 'To Do',
+    };
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+  };
+
+  return (
+    <div className="flex space-x-4 p-8">
+      <Column
+        title="To Do"
+        tasks={tasks.filter((task) => task.status === 'To Do')}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      />
+      <Column
+        title="In Progress"
+        tasks={tasks.filter((task) => task.status === 'In Progress')}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      />
+      <Column
+        title="Done"
+        tasks={tasks.filter((task) => task.status === 'Done')}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      />
+      <button
+        onClick={handleOpen}
+        className="bg-green-500 text-white p-4 rounded"
+      >
+        Add Task
+      </button>
+      <Modal
+        isOpen={open}
+        onClose={handleClose}
+        onSave={addTask}
+      />
+    </div>
+  );
 };
 
 export default Home;
