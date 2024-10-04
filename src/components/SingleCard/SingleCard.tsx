@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface SingleCardProps {
   id: number;
@@ -7,24 +7,33 @@ interface SingleCardProps {
 }
 
 const SingleCard: React.FC<SingleCardProps> = ({ id, title, description }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData('text/plain', id.toString());  // Passa o ID do cartão
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    e.dataTransfer.clearData();
-  };
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div
-      className="bg-white shadow p-4 mb-4 rounded-md"
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <h3 className="text-lg font-bold">{title}</h3>
-      <p>{description}</p>
+    <div>
+      <div
+        className="bg-white shadow rounded p-4 mb-2 cursor-pointer hover:bg-gray-100"
+        draggable
+        onClick={openModal} // Exibe o modal ao clicar
+        onDragStart={(e) => e.dataTransfer.setData('text/plain', id.toString())}
+      >
+        <h3 className="font-bold text-center">{title}</h3> {/* Nome centralizado */}
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">{title}</h2>
+            <p>{description}</p>
+            <button onClick={closeModal} className="mt-4 bg-red-500 text-white p-2 rounded">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,14 +1,10 @@
 import React from 'react';
 import SingleCard from '@/components/SingleCard/SingleCard';
+import { Task } from '@/components/types/types';
 
 interface ColumnProps {
   title: string;
-  tasks: {
-    id: number;
-    title: string;
-    description: string;
-    status: string;
-  }[];
+  tasks: Task[];
   onDrop: (e: React.DragEvent, status: string) => void;
   onDragOver: (e: React.DragEvent) => void;
 }
@@ -16,13 +12,19 @@ interface ColumnProps {
 const Column: React.FC<ColumnProps> = ({ title, tasks, onDrop, onDragOver }) => {
   return (
     <div
-      className="flex-1 bg-gray-100 p-4 rounded-md"
-      onDrop={(e) => onDrop(e, title)} // Passa o título da coluna (status)
+      className="w-64 bg-white p-4 rounded-md flex-grow mt-4 sm:mt-8 mr-4 shadow-lg" // Borda arredondada e sombra
+      onDrop={(e) => onDrop(e, title)}
       onDragOver={onDragOver}
     >
-      <h2 className="text-xl font-bold mb-4">{title}</h2>
+      <h2 className="text-xl font-bold mb-4 text-center">{title}</h2>
       {tasks.map((task) => (
-        <SingleCard key={task.id} id={task.id} title={task.title} description={task.description} />
+        <div key={task.id} className="mb-4"> {/* Margem entre os cartões */}
+          <SingleCard 
+            id={task.id} 
+            title={task.title} 
+            description={task.description} 
+          />
+        </div>
       ))}
     </div>
   );
