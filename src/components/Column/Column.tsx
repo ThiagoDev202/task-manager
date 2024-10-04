@@ -1,15 +1,14 @@
 import React from 'react';
-import SingleCard from '../SingleCard/SingleCard';
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-}
+import SingleCard from '@/components/SingleCard/SingleCard';
 
 interface ColumnProps {
   title: string;
-  tasks: Task[];
+  tasks: {
+    id: number;
+    title: string;
+    description: string;
+    status: string;
+  }[];
   onDrop: (e: React.DragEvent, status: string) => void;
   onDragOver: (e: React.DragEvent) => void;
 }
@@ -17,13 +16,13 @@ interface ColumnProps {
 const Column: React.FC<ColumnProps> = ({ title, tasks, onDrop, onDragOver }) => {
   return (
     <div
-      onDrop={(e) => onDrop(e, title)}
+      className="flex-1 bg-gray-100 p-4 rounded-md"
+      onDrop={(e) => onDrop(e, title)} // Passa o título da coluna (status)
       onDragOver={onDragOver}
-      className="bg-gray-200 p-4 rounded-lg w-64 h-full"
     >
-      <h2 className="font-bold mb-4">{title}</h2>
+      <h2 className="text-xl font-bold mb-4">{title}</h2>
       {tasks.map((task) => (
-        <SingleCard key={task.id} task={task} onDragStart={() => {}} />
+        <SingleCard key={task.id} id={task.id} title={task.title} description={task.description} />
       ))}
     </div>
   );

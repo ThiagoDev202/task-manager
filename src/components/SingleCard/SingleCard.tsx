@@ -1,19 +1,30 @@
 import React from 'react';
 
 interface SingleCardProps {
-  task: { id: number; title: string; description: string };
-  onDragStart: (e: React.DragEvent, id: number) => void;
+  id: number;
+  title: string;
+  description: string;
 }
 
-const SingleCard: React.FC<SingleCardProps> = ({ task, onDragStart }) => {
+const SingleCard: React.FC<SingleCardProps> = ({ id, title, description }) => {
+
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', id.toString());  // Passa o ID do cartão
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    e.dataTransfer.clearData();
+  };
+
   return (
     <div
+      className="bg-white shadow p-4 mb-4 rounded-md"
       draggable
-      onDragStart={(e) => onDragStart(e, task.id)}
-      className="bg-white p-4 rounded-lg shadow-md mb-2"
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
     >
-      <h3 className="font-bold">{task.title}</h3>
-      <p>{task.description}</p>
+      <h3 className="text-lg font-bold">{title}</h3>
+      <p>{description}</p>
     </div>
   );
 };
