@@ -15,7 +15,10 @@ const Home: React.FC = () => {
   const [columns, setColumns] = useState<string[]>(['Backlog', 'Sprint Backlog', 'Dev', 'Code Review', 'Testing', 'Done']);
   const { open, handleOpen, handleClose, handleSave } = useModal();
   
-  // Função para criar uma nova coluna
+  // Novo estado para o título e descrição da tarefa
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+
   const addColumn = () => {
     const newColumnTitle = prompt('Digite o nome da nova coluna:');
     if (newColumnTitle) {
@@ -78,6 +81,10 @@ const Home: React.FC = () => {
         isOpen={open}
         onClose={handleClose}
         onSave={addTask}
+        title={taskTitle} // Passando o título
+        description={taskDescription} // Passando a descrição
+        setTitle={setTaskTitle} // Passando a função para atualizar o título
+        setDescription={setTaskDescription} // Passando a função para atualizar a descrição
       />
     </div>
   );

@@ -4,16 +4,17 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (title: string, description: string) => void;
+  title: string; // Novas propriedades
+  description: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>; // Função para atualizar o título
+  setDescription: React.Dispatch<React.SetStateAction<string>>; // Função para atualizar a descrição
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
-  const [title, setTitle] = React.useState('');
-  const [description, setDescription] = React.useState('');
-
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, title, description, setTitle, setDescription }) => {
   const handleSubmit = () => {
     onSave(title, description);
-    setTitle('');
-    setDescription('');
+    setTitle(''); // Limpar o título
+    setDescription(''); // Limpar a descrição
     onClose();
   };
 
