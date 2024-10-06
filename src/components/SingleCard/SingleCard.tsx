@@ -26,11 +26,17 @@ const SingleCard: React.FC<SingleCardProps> = ({ id, title, description, onEdit 
     closeModal();
   };
 
+  // Função para lidar com o início do arrasto
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', id.toString()); // Armazena o ID da task no evento
+  };
+
   return (
     <div>
       <div
         className="bg-white shadow rounded p-4 mb-2 cursor-pointer hover:bg-gray-100"
         draggable
+        onDragStart={handleDragStart} // Adiciona o evento de arrastar
         onClick={openModal} // Exibe o modal ao clicar
       >
         <h3 className="font-bold text-center">{title}</h3>

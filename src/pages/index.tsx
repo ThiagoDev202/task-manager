@@ -13,17 +13,17 @@ interface Task {
 const Home: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [columns, setColumns] = useState<string[]>(['Backlog', 'Sprint Backlog', 'Dev', 'Code Review', 'Testing', 'Done']);
-  const { open, handleOpen, handleClose, handleSave } = useModal();
   
-  // Novo estado para o título e descrição da tarefa
+  const { open, handleOpen, handleClose, handleSave } = useModal();
+
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
 
-  const addColumn = () => {
-    const newColumnTitle = prompt('Digite o nome da nova coluna:');
-    if (newColumnTitle) {
-      setColumns([...columns, newColumnTitle]);
-    }
+  const [columnTitle, setColumnTitle] = useState('');
+  const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
+
+  const addColumn = (title: string) => {
+    setColumns((prevColumns) => [...prevColumns, title]);
   };
 
   const handleDrop = (e: React.DragEvent, status: string) => {
@@ -39,7 +39,7 @@ const Home: React.FC = () => {
     e.preventDefault();
   };
 
-  const addTask = (title: string, description: string) => {
+  const addTask = (title: string, description: string = '') => {
     const newTask: Task = {
       id: Date.now(),
       title,
@@ -47,11 +47,34 @@ const Home: React.FC = () => {
       status: 'Backlog',
     };
     setTasks((prevTasks) => [...prevTasks, newTask]);
+  };  
+
+  const handleEditTask = (id: number, title: string, description: string) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === id ? { ...task, title, description } : task
+    );
+    setTasks(updatedTasks);
+  };
+
+  const openColumnModal = () => {
+    setColumnTitle('');
+    setIsColumnModalOpen(true);
+  };
+
+  const closeColumnModal = () => {
+    setIsColumnModalOpen(false);
+  };
+
+  const saveColumn = () => {
+    if (columnTitle.trim() !== '') {
+      addColumn(columnTitle);
+      closeColumnModal();
+    }
   };
 
   return (
-    <div className="bg-gray-200 min-h-screen p-8"> {/* Fundo cinza */}
-      <h1 className="text-4xl font-bold text-center mb-8">Task Manager - Scrum Agile Project</h1> {/* Título */}
+    <div className="bg-gray-200 min-h-screen p-8">
+      <h1 className="text-4xl font-bold text-center mb-8">Task Manager - Scrum Agile Project</h1>
       
       <div className="flex overflow-x-auto space-x-4">
         {columns.map((column) => (
@@ -61,6 +84,7 @@ const Home: React.FC = () => {
             tasks={tasks.filter((task) => task.status === column)}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
+            onEditTask={handleEditTask} // Passando a função para editar tasks
           />
         ))}
       </div>
@@ -71,7 +95,7 @@ const Home: React.FC = () => {
         </div>
         
         <button 
-          onClick={addColumn} 
+          onClick={openColumnModal} 
           className="bg-gray-100 text-gray-600 p-4 rounded shadow hover:bg-gray-300">
           + Add New Column
         </button>
@@ -81,10 +105,19 @@ const Home: React.FC = () => {
         isOpen={open}
         onClose={handleClose}
         onSave={addTask}
-        title={taskTitle} // Passando o título
-        description={taskDescription} // Passando a descrição
-        setTitle={setTaskTitle} // Passando a função para atualizar o título
-        setDescription={setTaskDescription} // Passando a função para atualizar a descrição
+        title={taskTitle}
+        description={taskDescription}
+        setTitle={setTaskTitle}
+        setDescription={setTaskDescription}
+      />
+
+      <Modal
+        isOpen={isColumnModalOpen}
+        onClose={closeColumnModal}
+        onSave={saveColumn}
+        title={columnTitle}
+        setTitle={setColumnTitle}
+        isColumn={true} // Adicione um prop ou qualquer lógica que diferencie o modal de tasks e colunas, se necessário
       />
     </div>
   );
